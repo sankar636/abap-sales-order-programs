@@ -1,0 +1,16 @@
+*&---------------------------------------------------------------------*
+*& Include          ZG_SALES_REPORT_P_FIELDCATF01
+*&---------------------------------------------------------------------*
+
+FORM p_fieldcat USING pv_col_pos
+                      pv_field_name
+                      pv_seltext_1
+                CHANGING lt_fieldcat TYPE slis_t_fieldcat_alv.
+
+  lwa_fieldcat-col_pos = pv_col_pos.
+  lwa_fieldcat-fieldname = pv_field_name.
+  lwa_fieldcat-seltext_l = pv_seltext_1.
+  APPEND lwa_fieldcat TO lt_fieldcat.
+  CLEAR lwa_fieldcat.
+
+ENDFORM.

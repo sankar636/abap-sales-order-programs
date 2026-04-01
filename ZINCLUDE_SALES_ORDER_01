@@ -1,0 +1,10 @@
+*&---------------------------------------------------------------------*
+*& Include          ZDATA_SALESORDER
+*&---------------------------------------------------------------------*
+
+DATA: lv_erdat TYPE erdat.
+DATA: lv_ernam TYPE ernam.
+DATA: lt_final TYPE ztt_output.
+DATA: lwa_final TYPE zstr_output.
+DATA: lt_fieldcat TYPE slis_t_fieldcat_alv.
+DATA: lwa_fieldcat TYPE slis_fieldcat_alv.
