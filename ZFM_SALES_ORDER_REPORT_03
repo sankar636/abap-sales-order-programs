@@ -1,0 +1,56 @@
+FUNCTION zfm_sales_order.
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  IMPORTING
+*"     REFERENCE(SERDAT) TYPE  ZTT_ERDAT
+*"     REFERENCE(SERNAM) TYPE  ZTT_ERNAM
+*"  EXPORTING
+*"     REFERENCE(LT_OUTPUT) TYPE  ZTT_OUTPUT
+*"  EXCEPTIONS
+*"      WRONG_INPUT
+*"----------------------------------------------------------------------
+
+  DATA: lwa_output TYPE zstr_output.
+
+  IF serdat IS INITIAL.
+    RAISE wrong_input.
+  ENDIF.
+
+  SELECT a~vbeln, b~posnr, b~matnr, b~kwmeng, b~vrkme
+  FROM vbak AS a JOIN vbap AS b
+  ON a~vbeln = b~vbeln
+  INTO TABLE @DATA(lt_data)
+  WHERE a~erdat IN @serdat
+  AND a~ernam IN @sernam.
+
+
+  IF lt_data IS NOT INITIAL.
+    DATA(lt_temp_data) = lt_data.
+    DELETE lt_temp_data WHERE matnr IS INITIAL.
+    SORT lt_temp_data BY matnr.
+    DELETE ADJACENT DUPLICATES FROM lt_temp_data COMPARING matnr.
+    SELECT matnr, maktx
+    FROM makt
+    INTO TABLE @DATA(lt_makt)
+    FOR ALL ENTRIES IN @lt_temp_data
+    WHERE matnr = @lt_temp_data-matnr
+    AND spras = @sy-langu.
+  ENDIF.
+
+  SORT lt_data BY vbeln.
+
+  LOOP AT lt_data INTO DATA(lwa_data).
+    IF line_exists( lt_makt[ matnr = lwa_data-matnr ] ).
+      DATA(lwa_makt) = lt_makt[ matnr = lwa_data-matnr ].
+    ENDIF.
+    lwa_output = VALUE #( vbeln = lwa_data-vbeln
+                          posnr = lwa_data-posnr
+                          matnr = lwa_data-matnr
+                          maktx = lwa_makt-maktx
+                          kwmeng = lwa_data-kwmeng
+                          vrkme = lwa_data-vrkme ).
+    APPEND lwa_output TO lt_output.
+    CLEAR : lwa_output, lwa_data, lwa_makt.
+  ENDLOOP.
+
+ENDFUNCTION.
